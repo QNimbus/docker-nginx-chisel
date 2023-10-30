@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: nginx-service
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /opt/docker/nginx/conf/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+      - type: bind
+        source: /opt/docker/nginx/conf/conf.d
+        target: /etc/nginx/conf.d
+        read_only: true
+      - type: bind
+        source: /opt/docker/nginx/le
+        target: /etc/letsencrypt
+        read_only: true
+      - type: bind
+        source: /opt/docker/nginx/certs
+        target: /etc/nginx/certs
+        read_only: true
+      - type: bind
+        source: /opt/docker/nginx/tmp/acme_challenge
+        target: /tmp/acme_challenge
+        read_only: true
+    networks:
+      - chisel
+    ports:
+      - 80:80
+      - 443:443
+    environment: []
+
+  chisel:
+    container_name: chisel-service
+    image: jpillora/chisel
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /opt/docker/nginx/chisel/data
+        target: /data
+        read_only: true
+      - type: bind
+        source: /opt/docker/nginx/chisel/.cache
+        target: /.cache
+        read_only: false
+    networks:
+      - chisel
+    ports:
+      - 2334:2334
+    environment:
+      - CHISEL_LE_CACHE=/.cache
+    command:
+      - 'server'
+      - '--keyfile=/data/key'
+      - '--port=2334'
+      - '--authfile=/data/users.json'
+      - '--reverse'
+
+networks:
+  chisel:
+    driver: bridge
+

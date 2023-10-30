@@ -1,0 +1,18 @@
+
+docker-compose-le.yaml
+!docker-compose-le.yaml.example
+
+# Ignore LetsEncrypt files
+le/*
+tmp
+
+# Ignore nginx config files
+conf/conf.d/*
+
+# Ignore chisel files
+chisel/.cache
+chisel/data/*
+
+# Exceptions
+!*.inactive
+!*.example
