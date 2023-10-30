@@ -4,8 +4,7 @@ services:
   letsencrypt:
     container_name: certbot-service
     image: certbot/certbot:latest
-    command: 'sh -c "certbot certonly --expand --webroot -w /tmp/acme_challenge -d myhost.example.com --text --agree-tos --email certbot.letsencrypt@myhost.example.com --rsa-key-size 4096 --verbose --keep-until-expiring --preferred-challenges=http"'
-    entrypoint: ''
+    network_mode: host
     volumes:
       - type: bind
         source: /opt/docker/nginx/le
@@ -15,6 +14,12 @@ services:
         source: /opt/docker/nginx/tmp/acme_challenge
         target: /tmp/acme_challenge
         read_only: false
+      - type: bind
+        source: /opt/docker/nginx/certbot.sh
+        target: /usr/local/bin/certbot.sh
+        read_only: false
+    entrypoint: ["/bin/sh", "-c", "chmod +x /usr/local/bin/certbot.sh && /usr/local/bin/certbot.sh"]
     environment:
+      - LE_EMAIL=certbot.letsencrypt@example.com
+      - LE_DOMAINS=test1.example.com,test2.example.com
       - TERM=xterm
-
