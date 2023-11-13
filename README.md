@@ -40,6 +40,15 @@ This repository contains the Docker configuration for setting up an Nginx server
 
 Once the service is running, you can configure your client devices to connect to the Chisel server through the Nginx reverse proxy. The specifics will depend on the configuration you have chosen.
 
+## Cron
+
+Example crontab configuration:
+
+```sh
+# m h  dom mon dow   command
+0 0 * * 0 COMPOSE_PROJECT_NAME=certbot docker compose -f /opt/docker/nginx/docker-compose-le.yaml up --exit-code-from certbot; exit_code=$?; docker exec nginx nginx -s reload; docker container prune -f; exit $exit_code
+```
+
 ## Security
 
 Ensure that your Nginx and Chisel instances are properly secured. This includes:
